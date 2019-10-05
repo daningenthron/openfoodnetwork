@@ -9,25 +9,26 @@ blocks:
     task:
       prologue:
         commands:
-          - >-
-            checkout - cache restore - sem-service start postgres - sem-version
-            ruby 2.1.9 - bundle install --deployment --path vendor/bundle - cp
-            config/application.yml.example config/application.yml -
-            'RAILS_ENV=test bundle exec rake db:create db:schema:load' -
-            change-phantomjs-version 2.1.1
+          - checkout
+          - cache restore
+          - sem-service start postgres
+          - sem-version ruby 2.1.9
+          - bundle install --deployment --path vendor/bundle
+          - cp config/application.yml.example config/application.yml
+          - 'RAILS_ENV=test bundle exec rake db:create db:schema:load'
+          - change-phantomjs-version 2.1.1
       jobs:
         - name: 'Job #1'
-          commands:
-            - bundle install --deployment --path vendor/bundle
-            - cp config/application.yml.example config/application.yml
-            - 'RAILS_ENV=test bundle exec rake db:create db:schema:load'
-            - change-phantomjs-version 2.1.1
-        - name: 'Job #2'
           commands:
             - npm install -g npm@'3.8.8'
             - npm install
             - npm install -g karma-cli@0.1.2
             - 'RAILS_ENV=test bundle exec rake karma:run'
+            - >-
+              bundle exec rake 'knapsack:rspec[--tag ~performance --format
+              progress -p]'
+        - name: 'Job #2'
+          commands:
             - >-
               bundle exec rake 'knapsack:rspec[--tag ~performance --format
               progress -p]'
