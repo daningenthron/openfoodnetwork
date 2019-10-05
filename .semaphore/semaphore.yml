@@ -1,0 +1,87 @@
+version: v1.0
+name: First pipeline
+agent:
+  machine:
+    type: a1-standard-2
+    os_image: macos-mojave
+blocks:
+  - name: Setup
+    task:
+      prologue:
+        commands:
+          - checkout
+      jobs:
+        - name: 'Job #1'
+          commands:
+            - bundle install --deployment --path vendor/bundle
+        - name: 'Job #2'
+          commands:
+            - cp config/application.yml.example config/application.yml
+        - name: 'Job #3'
+          commands:
+            - 'RAILS_ENV=test bundle exec rake db:create db:schema:load'
+        - name: 'Job #4'
+          commands:
+            - change-phantomjs-version 2.1.1
+      env_vars:
+        - name: TZ
+          value: Australia/Melbourne
+  - name: Unit tests
+    task:
+      prologue:
+        commands:
+          - checkout
+      jobs:
+        - name: 'Job #1'
+          commands:
+            - npm install -g npm@'3.8.8'
+        - name: 'Job #2'
+          commands:
+            - npm install
+        - name: 'Job #3'
+          commands:
+            - npm install -g karma-cli@0.1.2
+        - name: 'Job #4'
+          commands:
+            - 'RAILS_ENV=test bundle exec rake karma:run'
+        - name: 'Job #5'
+          commands:
+            - >-
+              bundle exec rake 'knapsack:rspec[--tag ~performance --format
+              progress -p]'
+      env_vars:
+        - name: TZ
+          value: Australia/Melbourne
+  - name: 'Block #3'
+    task:
+      env_vars:
+        - name: TZ
+          value: Australia/Melbourne
+      jobs:
+        - name: 'Job #1'
+          commands:
+            - >-
+              bundle exec rake 'knapsack:rspec[--tag ~performance --format
+              progress -p]'
+  - name: 'Block #4'
+    task:
+      env_vars:
+        - name: TZ
+          value: Australia/Melbourne
+      jobs:
+        - name: 'Job #1'
+          commands:
+            - >-
+              bundle exec rake 'knapsack:rspec[--tag ~performance --format
+              progress -p]'
+  - name: 'Block #5'
+    task:
+      env_vars:
+        - name: TZ
+          value: Australia/Melbourne
+      jobs:
+        - name: 'Job #1'
+          commands:
+            - >-
+              bundle exec rake 'knapsack:rspec[--tag ~performance --format
+              progress -p]'
